@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- REX AGENT NOTIFY LISTENER. RESTART ON EXIT. 30 SEC MIN BETWEEN STARTS. -->
+<!-- TEMPLATE. install.sh FILLS @TOKENS@. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>local.rex-notify</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>@REX@</string>
+    <string>--autostart=false</string>
+    <string>do</string>
+    <string>@NOTIFY_LUA@</string>
+    <string>--all</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>REX_SERVER</key>
+    <string>@REX_SERVER@</string>
+    <key>REX_NOTIFY_REX</key>
+    <string>@REX@</string>
+    <key>REX_NOTIFY_NOTIFIER</key>
+    <string>@NOTIFIER@</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+  <key>StandardOutPath</key>
+  <string>@LOG@</string>
+  <key>StandardErrorPath</key>
+  <string>@LOG@</string>
+</dict>
+</plist>
