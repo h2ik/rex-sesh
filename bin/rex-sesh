@@ -72,15 +72,25 @@ LUA
 
 # SESSION ROWS FROM SESSION JSON. COLOR DOT AFTER LABEL.
 # YELLOW: BLOCKED. RED: ERROR. GREEN: DONE. BLUE: WORKING.
+# SORT ORDER: ORIGIN, BLOCKED, ERROR, DONE, IDLE, WORKING, NO REPORT.
+# SORT IS STABLE. SESSION.LIST ORDER STAYS IN EACH GROUP.
 session_rows() {
-  jq -r '
+  jq -r --arg origin "$REX_SESH_ORIGIN" '
+    def order:
+      if   (.session_id | ltrimstr("session:")) == ($origin | ltrimstr("session:")) then 0
+      elif .state == "blocked"    then 1
+      elif .state == "error"      then 2
+      elif .state == "done"       then 3
+      elif .state == "idle"       then 4
+      elif .state == "working"    then 5
+      else 6 end;
     def dot:
       if   . == "blocked" then " \u001b[33m●\u001b[0m"
       elif . == "error"   then " \u001b[31m●\u001b[0m"
       elif . == "done"    then " \u001b[32m●\u001b[0m"
       elif . == "working" then " \u001b[34m●\u001b[0m"
       else "" end;
-    .[] | "s\t\(.session_id)\t🪟  \(.label)\(.state | dot)"'
+    sort_by(order) | .[] | "s\t\(.session_id)\t🪟  \(.label)\(.state | dot)"'
 }
 
 list_sessions() {
