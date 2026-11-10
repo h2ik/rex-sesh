@@ -144,9 +144,14 @@ do_preview() {
   local kind="$1" id="$2"
   if [[ "$kind" == s ]]; then
     # PREVIEW SESSION. CAPTURE FOCUSED BLOCK OF ACTIVE WINDOW.
+    # FOCUSED BLOCK IN FLOATING LAYER (PICKER FLOAT): USE FIRST TILED BLOCK.
     local block
-    block=$("$REX" session inspect "$id" --json | jq -r \
-      '.active_window_id as $w | .windows[] | select(.window_id == $w) | .focused_block_id')
+    block=$("$REX" session inspect "$id" --json | jq -r '
+      .active_window_id as $w
+      | .windows[] | select(.window_id == $w)
+      | [.layers[] | select(.kind == "tiled") | .blocks[].block_id] as $tiled
+      | if (.focused_block_id as $f | $tiled | index($f)) then .focused_block_id
+        else ($tiled[0] // empty) end')
     if [[ -n "$block" && "$block" != null ]]; then
       "$REX" capture -s "$id" -b "$block" --trim --format=vt | tail -n "${FZF_PREVIEW_LINES:-40}"
     else
